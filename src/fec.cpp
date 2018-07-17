@@ -137,7 +137,14 @@ const void* FECDecoder::GetDataPtr(uint32_t chunk_id) {
                 });
                 cm256_decoded = true;
             }
-            assert(cm256_blocks[uint8_t(chunk_id)].Index == chunk_id);
+            if (cm256_blocks[uint8_t(chunk_id)].Index != chunk_id) {
+                LogPrintf("Bad cm256 state: %u != %u\nidxs:", cm256_blocks[uint8_t(chunk_id)].Index, chunk_id);
+                for (uint8_t i = 0; i < chunk_count; i++) {
+                    LogPrintf(" %u", cm256_blocks[i].Index);
+                }
+                LogPrintf("\n");
+                assert(false);
+            }
             return cm256_blocks[uint8_t(chunk_id)].Block;
         } else {
             assert(!wirehair_recover_block(state, chunk_id, (void*)&tmp_chunk, &chunk_size));
